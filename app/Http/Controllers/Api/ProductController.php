@@ -7,15 +7,18 @@ use App\Http\Requests\Product\StoreProductRequest;
 use App\Http\Requests\Product\UpdateProductRequest;
 use App\Http\Resources\ProductResource;
 use App\Models\Product;
+use App\Services\ProductService;
 
 class ProductController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
+    public function __construct(private ProductService $productService)
+    {
+    }
+
     public function index()
     {
-        $products = Product::with('vendor')->paginate(15);
+        $products = $this->productService->getAllProducts();
+
         return ProductResource::collection($products);
     }
 
@@ -24,11 +27,9 @@ class ProductController extends Controller
      */
     public function store(StoreProductRequest $request)
     {
-        $product = Product::create($request->validated());
-        $product->load('vendor');
+        $product = $this->productService->createProduct($request->validated());
 
         return new ProductResource($product);
-
     }
 
     /**
@@ -36,7 +37,8 @@ class ProductController extends Controller
      */
     public function show(Product $product)
     {
-        $product->load('vendor');
+        $this->productService->getProduct($product);
+
         return new ProductResource($product);
     }
 
@@ -45,8 +47,7 @@ class ProductController extends Controller
      */
     public function update(UpdateProductRequest $request, Product $product)
     {
-        $product->update($request->validated());
-        $product->load('vendor');
+        $this->productService->updateProduct($product , $request->validated());
 
         return new ProductResource($product);
     }
@@ -56,7 +57,7 @@ class ProductController extends Controller
      */
     public function destroy(Product $product)
     {
-        $product->delete();
+        $this->productService->deleteProduct($product);
 
         return response()->json(null,204);
     }
