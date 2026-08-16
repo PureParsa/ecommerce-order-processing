@@ -14,7 +14,7 @@ return [
     |
     */
 
-    'default' => env('MAIL_MAILER', 'log'),
+    'default' => env('MAIL_MAILER',  'log'),
 
     /*
     |--------------------------------------------------------------------------
@@ -60,7 +60,9 @@ return [
             //     'timeout' => 5,
             // ],
         ],
-
+        'cloudflare' => [
+            'transport' => 'cloudflare',
+        ],
         'resend' => [
             'transport' => 'resend',
         ],

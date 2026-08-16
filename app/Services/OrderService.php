@@ -2,13 +2,17 @@
 
 namespace App\Services;
 
+use App\Jobs\CreateInvoice;
+use App\Jobs\MarkOrderComplete;
 use App\Jobs\SendConfirmationEmail;
+use App\Jobs\SendSMS;
 use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\Product;
 use App\Models\User;
 use App\Exceptions\InsufficientStockException;
 use Exception;
+use Illuminate\Support\Facades\Bus;
 use Illuminate\Support\Facades\DB;
 
 class OrderService
@@ -61,7 +65,14 @@ class OrderService
             }
            return $order;
         });
-        SendConfirmationEmail::dispatch($order);
+        Bus::chain([
+            new CreateInvoice($order),
+            new SendConfirmationEmail($order),
+            new SendSMS($order),
+            new MarkOrderComplete($order),
+        ])->onConnection('database')
+            ->onQueue('default')
+            ->dispatch();
         return $order->load('orderItems', 'user');
         }
     public function getAllUserOrders(User $user)
