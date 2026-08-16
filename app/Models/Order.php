@@ -25,5 +25,15 @@ class Order extends Model
     {
         return $this->hasMany(Alert::class);
     }
-
+    public function vendors()
+    {
+        return $this->hasManyThrough(
+            Vendor::class,
+            OrderItem::class,
+            'order_id',
+            'id',
+            'id',
+            'vendor_id'
+        );
+    }
 }
