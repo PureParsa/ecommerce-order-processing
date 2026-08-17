@@ -27,6 +27,10 @@ class User extends Authenticatable
     {
         return $this->hasMany(Order::class);
     }
+    public function vendor()
+    {
+        return $this->belongsTo(Vendor::class);
+    }
     protected function casts(): array
     {
         return [

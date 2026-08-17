@@ -2,19 +2,18 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class Vendor extends Model
 {
-
+use hasfactory;
     protected $fillable = [
-        'name',
         'business_name',
         'email',
         'phone',
         'wallet_balance',
-        'payment_processing',
-        'locked_at',
+        'is_active',
     ];
 
     protected function casts(): array
@@ -40,5 +39,9 @@ class Vendor extends Model
     public function products()
     {
         return $this->hasMany(Product::class);
+    }
+    public function user()
+    {
+        return $this->hasOne(User::class);
     }
 }
