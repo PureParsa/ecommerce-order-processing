@@ -14,11 +14,9 @@ return new class extends Migration
             $table->string('email')->unique();
             $table->string('phone')->nullable();
             $table->decimal('wallet_balance')->default(0);
-            $table->boolean('payment_processing')->default(false);
-            $table->timestamp('locked_at')->nullable();
+            $table->boolean('is_active')->default(true);
             $table->timestamps();
 
-            $table->index('payment_processing');
         });
     }
 
