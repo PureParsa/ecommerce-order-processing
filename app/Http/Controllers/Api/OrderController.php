@@ -28,17 +28,19 @@ class OrderController extends Controller
 
     public function index()
     {
-        $user = auth()->user();
-        $orders = $this->orderService->getAllUserOrders($user);
+        $orders = $this->orderService->getAllUserOrders(auth()->user());
         return OrderResource::collection($orders);
     }
     public function show(Order $order)
     {
+        $this->authorize('view', $order);
+
         $orders = $this->orderService->getOrder($order);
         return new OrderResource($orders);
     }
     public function destroy(Order $order)
     {
+        $this->authorize('delete', $order);
         $this->orderService->deleteOrder($order);
         return response()->noContent();
     }

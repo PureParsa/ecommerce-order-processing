@@ -21,6 +21,7 @@ class User extends Authenticatable
         'password',
         'phone',
         'wallet_balance',
+        'vendor_id',
     ];
     public function orders()
     {
