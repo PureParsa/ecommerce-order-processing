@@ -27,7 +27,6 @@ class StoreProductRequest extends FormRequest
             'description' => 'nullable|string',
             'price' => 'required|numeric|min:0.01',
             'stock' => 'required|integer|min:0',
-            'vendor_id' => 'required|exists:vendors,id',
         ];
     }
     public function messages(): array
@@ -37,8 +36,6 @@ class StoreProductRequest extends FormRequest
             'price.required' => 'Product price is required',
             'price.min' => 'Price must be greater than 0',
             'stock.required' => 'Stock quantity is required',
-            'vendor_id.required' => 'Vendor ID is required',
-            'vendor_id.exists' => 'Selected vendor does not exist',
         ];
     }
 }

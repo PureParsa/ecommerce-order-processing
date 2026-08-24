@@ -1,11 +1,11 @@
 <?php
 
-namespace App\Http\Requests\Product;
+namespace App\Http\Requests\Auth;
 
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 
-class UpdateProductRequest extends FormRequest
+class CreateVendorRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -23,19 +23,17 @@ class UpdateProductRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name' => 'sometimes|required|string|max:255',
-            'description' => 'nullable|string',
-            'price' => 'sometimes|required|numeric|min:0.01',
-            'stock' => 'sometimes|required|integer|min:0',
+            'business_name' => 'required|string|max:255',
+            'email' => 'required|email|unique:vendors,email',
+            'phone' => 'required|string|digits:11',
         ];
     }
     public function messages(): array
     {
         return [
-            'name.required' => 'Product name is required',
-            'price.required' => 'Product price is required',
-            'price.min' => 'Price must be greater than 0',
-            'stock.required' => 'Stock quantity is required',
+            'business_name.required' => 'Business name is required',
+            'email.unique' => 'This email is already registered as vendor',
+            'phone.digits' => 'Phone must be 11 digits',
         ];
     }
 }

@@ -19,6 +19,10 @@ return new class extends Migration
             $table->string('password');
             $table->string('phone')->nullable();
             $table->decimal('wallet_balance')->default(0);
+            $table->foreignId('vendor_id')
+                ->nullable()
+                ->constrained('vendors')
+                ->onDelete('set null');
             $table->rememberToken();
             $table->timestamps();
         });

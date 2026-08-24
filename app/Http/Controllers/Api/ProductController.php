@@ -27,7 +27,12 @@ class ProductController extends Controller
      */
     public function store(StoreProductRequest $request)
     {
-        $product = $this->productService->createProduct($request->validated());
+        $this->authorize('create', Product::class);
+
+        $validated = $request->validated();
+        $validated['vendor_id'] = auth()->user()->vendor_id;
+
+        $product = $this->productService->createProduct($validated);
 
         return new ProductResource($product);
     }
@@ -47,9 +52,10 @@ class ProductController extends Controller
      */
     public function update(UpdateProductRequest $request, Product $product)
     {
-        $this->productService->updateProduct($product , $request->validated());
+        $this->authorize('update', $product);
 
-        return new ProductResource($product);
+        $updated = $this->productService->updateProduct($product, $request->validated());
+        return new ProductResource($updated);
     }
 
     /**
@@ -57,8 +63,9 @@ class ProductController extends Controller
      */
     public function destroy(Product $product)
     {
-        $this->productService->deleteProduct($product);
+        $this->authorize('delete', $product);
 
-        return response()->json(null,204);
+        $this->productService->deleteProduct($product);
+        return response()->noContent();
     }
 }
