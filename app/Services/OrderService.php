@@ -2,8 +2,10 @@
 
 namespace App\Services;
 
+use App\Exceptions\InsufficientWalletBalanceException;
 use App\Jobs\CreateInvoice;
 use App\Jobs\MarkOrderComplete;
+use App\Jobs\SendCashoutFailedEmail;
 use App\Jobs\SendConfirmationEmail;
 use App\Jobs\SendSMS;
 use App\Models\Order;
@@ -19,12 +21,17 @@ class OrderService
 {
     public function createOrder(User $user, array $data): Order
     {
-       $order= DB::transaction(function () use ($user, $data) {
+        $order = DB::transaction(function () use ($user, $data) {
+
+            $user = User::lockForUpdate()->findOrFail($user->id);
+
             $total = 0;
             $preparedItems = [];
 
             foreach ($data['items'] as $item) {
-                $product = Product::lockForUpdate()->findOrFail($item['product_id']);
+
+                $product = Product::lockForUpdate()
+                    ->findOrFail($item['product_id']);
 
                 if ($product->stock < $item['quantity']) {
                     throw new InsufficientStockException(
@@ -44,6 +51,10 @@ class OrderService
                 ];
             }
 
+            if ($user->wallet_balance < $total) {
+                throw new InsufficientWalletBalanceException();
+            }
+
             $order = Order::create([
                 'user_id' => $user->id,
                 'total_amount' => $total,
@@ -58,26 +69,33 @@ class OrderService
                     'price' => $item['price'],
                     'item_status' => 'pending',
                 ]);
+
                 $item['product']->decrement(
                     'stock',
                     $item['quantity']
                 );
             }
-           return $order;
+
+            $user->decrement('wallet_balance', $total);
+
+            return $order;
         });
+
         Bus::chain([
             new CreateInvoice($order),
             new SendConfirmationEmail($order),
             new SendSMS($order),
             new MarkOrderComplete($order),
-        ])->onConnection('database')
+        ])
+            ->onConnection('redis')
             ->onQueue('default')
             ->dispatch();
+
         return $order->load('orderItems', 'user');
-        }
+    }
     public function getAllUserOrders(User $user)
     {
-        return Order::where('user_id' , $user->id )->with('orderItems')->paginate(50);
+        return Order::where('user_id' , $user->id )->with('orderItems')->get();
     }
 
     public function getOrder(Order $order)

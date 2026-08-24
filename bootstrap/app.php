@@ -1,6 +1,7 @@
 <?php
 
 use App\Exceptions\InsufficientStockException;
+use App\Exceptions\InsufficientWalletBalanceException;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
@@ -24,6 +25,12 @@ return Application::configure(basePath: dirname(__DIR__))
         $exceptions->render(function (InsufficientStockException $e) {
             return response()->json([
                 'message' => 'Stock unavailable',
+                'error' => $e->getMessage(),
+            ], 422);
+        });
+        $exceptions->render(function (InsufficientWalletBalanceException $e) {
+            return response()->json([
+                'message' => 'Insufficient wallet balance',
                 'error' => $e->getMessage(),
             ], 422);
         });

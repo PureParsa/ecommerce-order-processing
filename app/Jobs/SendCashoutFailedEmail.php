@@ -3,15 +3,14 @@
 namespace App\Jobs;
 
 use App\Mail\CashoutFailedMail;
-use App\Mail\OrderConfirmationMail;
-use App\Models\Order;
+use App\Models\VendorCashOut;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use Throwable;
 
-class SendConfirmationEmail implements ShouldQueue
+class SendCashoutFailedEmail implements ShouldQueue
 {
     use Queueable;
 
@@ -19,22 +18,22 @@ class SendConfirmationEmail implements ShouldQueue
 
     public array $backoff = [10, 30, 60];
 
-    public function __construct(private Order $order)
+    public function __construct(private VendorCashOut $cashOut)
     {
     }
 
     public function handle(): void
     {
-        $user = $this->order->user;
+        $user = $this->cashOut->vendor->user;
 
         Mail::to($user->email)
-            ->send(new OrderConfirmationMail($this->order));
+            ->send(new CashoutFailedMail($this->cashOut));
     }
 
     public function failed(Throwable $exception): void
     {
-        Log::error('SendConfirmationEmail failed', [
-            'order_id' => $this->order->id,
+        Log::error('SendCashoutFailedEmail failed', [
+            'cashout_id' => $this->cashOut->id,
             'error' => $exception->getMessage(),
         ]);
     }
