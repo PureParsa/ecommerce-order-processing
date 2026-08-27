@@ -21,6 +21,7 @@ use hasfactory;
         return [
             'payment_processing' => 'boolean',
             'locked_at' => 'datetime',
+            'is_active' => 'boolean',
         ];
     }
 

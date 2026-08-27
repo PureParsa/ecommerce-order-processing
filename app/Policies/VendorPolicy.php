@@ -13,7 +13,8 @@ class VendorPolicy
     }
     public function cashout(User $user): bool
     {
-        return $user->vendor_id !== null;
+        return $user->vendor !== null
+            && $user->vendor->is_active === true ;
     }
     public function message(): string
     {
