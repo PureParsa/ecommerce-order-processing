@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\Auth\CreateVendorRequest;
+use App\Http\Requests\Vendor\CreateVendorRequest;
 use App\Http\Requests\Vendor\VendorCashOutRequest;
 use App\Http\Resources\VendorCashoutResource;
 use App\Http\Resources\VendorResource;
