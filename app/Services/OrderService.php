@@ -87,8 +87,6 @@ class OrderService
             new SendSMS($order),
             new MarkOrderComplete($order),
         ])
-            ->onConnection('redis')
-            ->onQueue('default')
             ->dispatch();
 
         return $order->load('orderItems', 'user');

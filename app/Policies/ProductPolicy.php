@@ -10,10 +10,8 @@ class ProductPolicy
 {
     public function create(User $user): bool
     {
-        if ($user->vendor_id === null) {
-            throw new AuthorizationException('Only vendors can create products');
-        }
-        return true;
+        return $user->vendor !== null
+            && $user->vendor->is_active === true ;
     }
 
     public function update(User $user, Product $product): bool
